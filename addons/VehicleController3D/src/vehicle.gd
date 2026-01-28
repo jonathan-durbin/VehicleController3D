@@ -1,7 +1,9 @@
+## RigidBody-based vehicle that coordinates wheel physics and input.
 extends RigidBody3D
 class_name Vehicle
 
 
+## Toggles wheel debug rendering and force gizmos.
 @export var debug: bool = false:
 	set(value):
 		debug = value
@@ -13,8 +15,11 @@ class_name Vehicle
 #@export var input_vehicle_acceleration: String
 #@export var input_vehicle_steering: String
 #@export var settings: VehicleSettings
+## GUIDE action used for throttle input.
 @export var input_vehicle_acceleration: GUIDEAction
+## GUIDE action used for steering input.
 @export var input_vehicle_steering: GUIDEAction
+## Shared vehicle settings resource.
 @export var settings: VehicleSettings
 
 #@export_group("Nodes")
@@ -25,10 +30,15 @@ class_name Vehicle
 # @export var back_left: VehicleWheel
 
 
+## Lookup of wheels by key (F-L, F-R, etc.).
 var wheels: Dictionary[String, VehicleWheel] = {}
+## Distance between front and rear axle centers.
 var body_length: float
+## Distance between left and right wheels on an axle.
 var axle_length: float
+## Linear velocity expressed in vehicle-local space.
 var local_velocity: Vector3
+## Tracks whether the initial ground position has been applied.
 var initial_position_set: bool = false
 
 
@@ -41,11 +51,13 @@ var initial_position_set: bool = false
 # var initial_position_set: bool = false
 
 
+## Initializes wheels and derives vehicle dimensions on ready.
 func _ready() -> void:
 	_initialize_wheels()
 	_calculate_body_axle_length()
 
 
+## Handles input-driven steering updates each frame.
 func _process(delta: float) -> void:
 	if not _has_required_inputs():
 		return
@@ -77,6 +89,7 @@ func _process(delta: float) -> void:
 
 
 #region Initial Position Calculation
+## Attempts to snap the vehicle to the ground on first update.
 func _try_set_initial_position() -> void:
 	var start_pos: Vector3 = _query_initial_position()
 	if start_pos.is_finite():
@@ -84,6 +97,7 @@ func _try_set_initial_position() -> void:
 		initial_position_set = true
 
 
+## Queries the ground beneath the vehicle to find a valid starting position.
 func _query_initial_position() -> Vector3:
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 	var query := PhysicsRayQueryParameters3D.create(
@@ -101,7 +115,7 @@ func _query_initial_position() -> Vector3:
 
 
 #region Utility
-## Calculates the Ackermann angle given wheel rotation and what side of the vehicle we're considering
+## Calculates the Ackermann angle for a wheel on the given axle side.
 func ackermann_angle(steering_rotation: float, axle_sign: float) -> float:
 	return atan(body_length/(body_length/tan(steering_rotation)+(axle_sign*axle_length)/2.0))
 
@@ -110,6 +124,7 @@ func ackermann_angle(steering_rotation: float, axle_sign: float) -> float:
 
 
 #region Initialization
+## Finds wheel nodes, assigns roles, and initializes wheel state.
 func _initialize_wheels() -> void:
 	if wheel_nodes.is_empty():
 		push_error("No wheel nodes assigned to Vehicle.")
@@ -189,6 +204,7 @@ func _initialize_wheels() -> void:
 		wheels[wheel_key].initialize()
 
 
+## Calculates body and axle lengths using wheel positions.
 func _calculate_body_axle_length() -> void:
 	if not wheels.has("F-R") or not wheels.has("F-L") or not wheels.has("B-R") or not wheels.has("B-L"):
 		return
@@ -206,6 +222,7 @@ func _calculate_body_axle_length() -> void:
 #endregion
 
 
+## Validates that required settings, inputs, and wheels are available.
 func _has_required_inputs() -> bool:
 	if settings == null:
 		push_error("Vehicle settings are missing.")

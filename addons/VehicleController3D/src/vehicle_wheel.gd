@@ -1,14 +1,17 @@
 class_name VehicleWheel
 extends RayCast3D
-## Raycast vehicle wheel node.
+## Raycast vehicle wheel node that handles suspension, traction, and visuals.
 
+## Minimum delta used to avoid division by zero in physics calculations.
 const MIN_DELTA: float = 0.0001
 
+## Wheel position relative to vehicle length.
 enum FrontBackType {
 	FRONT,
 	BACK,
 	NONE,
 }
+## Wheel position relative to vehicle width.
 enum LeftRightType {
 	LEFT,
 	RIGHT,
@@ -19,7 +22,7 @@ enum LeftRightType {
 ## I *think* the right idea is to offset such that the raycast starts from within the vehicle body.
 const VERTICAL_OFFSET: float = 0.5
 
-## Altering this at runtime should be doable.
+## Enables debug visuals such as gizmos and force boxes.
 var debug: bool = false:
 	set(value):
 		debug = value
@@ -27,46 +30,48 @@ var debug: bool = false:
 			debug_box.visible = debug
 		if is_instance_valid(gizmo):
 			gizmo.visible = debug
-## Set by Vehicle
+## Set by Vehicle to indicate front/back placement.
 ## None type allows for vehicles to have middle wheels (tank-like vehicles)
 var front_back: FrontBackType = FrontBackType.NONE
-## Set by Vehicle
+## Set by Vehicle to indicate left/right placement.
 var left_right: LeftRightType
-## Set by Vehicle
+## Set by Vehicle to indicate whether the wheel receives drive force.
 var is_powered: bool = false
-## Set by each wheel - finds children with "wheel" in their name
+## Mesh instance used to animate wheel visuals.
 var wheel_meshinstance: MeshInstance3D
-## Portion of the lateral velocity (x axis) to reduce by each frame
+## Portion of the lateral velocity (x axis) to reduce by each frame.
 var grip: float
-## Used to calculate how quickly the suspension is displacing
+## Used to calculate how quickly the suspension is displacing.
 var previous_spring_length: float = 0.0
-## Strength of the spring. Calculated and set in initialize()
+## Strength of the spring. Calculated and set in initialize().
 var spring_strength: float
-## The curve used to sample the amount of traction the wheels have. Set in initialize()
+## The curve used to sample the amount of traction the wheels have. Set in initialize().
 var grip_curve: Curve
-## Total forces applied to the car from this wheel
+## Total forces applied to the car from this wheel.
 var total_forces: Vector3
 ## Position from which forces are applied.
 ## Set to the collision point plus the wheel radius,
 ##    placing it in the center of each wheel
 var force_position: Vector3
-## Velocity of the wheel local to the car, calculated every physics tick
+## Velocity of the wheel local to the car, calculated every physics tick.
 var velocity_at_wheel: Vector3
-## Created in initialize()
+## Debug mesh for visualizing applied force position. Created in initialize().
 var debug_box: MeshInstance3D
-## Created in initialize()
+## Debug gizmo for displaying force vectors. Created in initialize().
 var gizmo: Gizmo3D
 ## This is meant to be considered the "true" global position of the wheel, since the raycast is
 ## It's good to bump the raycast up by a bit so that if the Vehicle bottoms out, the ground is still detected.
 # var global_position_offset: Vector3
 ## The original position of the raycast after applying the offset.
-## Set as the initial position of the raycast (before applying the above offset)
+## Set as the initial position of the raycast (before applying the above offset).
 ## The wheel mesh cannot be placed above this point.
 var wheel_origin: Vector3
 
+## Parent vehicle that owns this wheel.
 var parent: Vehicle
 
 
+## Performs per-physics-tick wheel simulation and visual updates.
 func _physics_process(delta: float) -> void:
 	# global_position_offset = to_global(position - Vector3(0.0, VERTICAL_OFFSET, 0.0))
 	velocity_at_wheel = get_velocity_at(to_global(wheel_origin))
@@ -100,6 +105,7 @@ func _physics_process(delta: float) -> void:
 		gizmo.set_targetf("Z", total_forces.z/20.0)
 
 
+## Initializes wheel resources, raycast setup, and derived settings.
 func initialize() -> void:
 	# Set up debug box
 	debug_box = MeshInstance3D.new()
@@ -149,12 +155,14 @@ func initialize() -> void:
 
 
 #region Visuals - Wheel Mesh Position and Rotation
+## Smoothly sets the wheel mesh height toward the suspension target.
 func set_wheel_height(value: float, delta: float) -> void:
 	if wheel_meshinstance == null:
 		return
 	wheel_meshinstance.position.y = lerpf(wheel_meshinstance.position.y, value, 20.0 * delta)
 
 
+## Rotates the wheel mesh based on vehicle speed and direction.
 func rotate_wheel(delta: float):
 	if wheel_meshinstance == null:
 		return
@@ -166,6 +174,7 @@ func rotate_wheel(delta: float):
 
 
 #region Suspension
+## Applies suspension forces based on collision distance.
 func handle_suspension(delta: float, collision_point: Vector3) -> void:
 	var safe_delta := maxf(delta, MIN_DELTA)
 	# Direction the suspension force will be applied
@@ -203,6 +212,7 @@ func handle_suspension(delta: float, collision_point: Vector3) -> void:
 
 
 #region Acceleration
+## Applies drive and drag forces for powered wheels.
 func handle_acceleration(_delta: float, _collision_point: Vector3) -> void:
 	if not is_powered:
 		return
@@ -239,6 +249,7 @@ func handle_acceleration(_delta: float, _collision_point: Vector3) -> void:
 
 
 #region Steering
+## Applies lateral grip forces to counteract slip.
 func handle_steering(delta: float, collision_point: Vector3) -> void:
 	var safe_delta := maxf(delta, MIN_DELTA)
 	var axle_dir: Vector3 = global_basis.x
