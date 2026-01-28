@@ -1,5 +1,5 @@
+class_name VehicleControllerSettings
 extends Resource
-class_name VehicleSettings
 
 
 @export_group("Suspension and Wheels")
@@ -16,6 +16,10 @@ class_name VehicleSettings
 @export var spring_rest_dist: float = 0.3
 ## Distance from the center of the wheel to the outside edge
 @export var wheel_radius: float = 0.3
+## Amount of vertical offset being applied to set the raycast form within the vehicle's body.
+## Some small value like 0.5m should be a good default.
+## I *think* the right idea is to offset such that the raycast starts from within the vehicle body.
+@export var vertical_offset: float = 0.5
 @export_flags_3d_physics var ground_layer: int
 
 

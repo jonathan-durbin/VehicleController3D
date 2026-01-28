@@ -1,8 +1,9 @@
-class_name VehicleWheel
+class_name VehicleController3DWheel
 extends RayCast3D
-## Raycast vehicle wheel node.
+## Raycast-based vehicle wheel node.
 
 const MIN_DELTA: float = 0.0001
+
 
 enum FrontBackType {
 	FRONT,
@@ -14,10 +15,6 @@ enum LeftRightType {
 	RIGHT,
 }
 
-## Amount of vertical offset being applied.
-## Some small value like 0.5m should be a good default.
-## I *think* the right idea is to offset such that the raycast starts from within the vehicle body.
-const VERTICAL_OFFSET: float = 0.5
 
 ## Altering this at runtime should be doable.
 var debug: bool = false:
@@ -64,11 +61,11 @@ var gizmo: Gizmo3D
 ## The wheel mesh cannot be placed above this point.
 var wheel_origin: Vector3
 
-var parent: Vehicle
+var parent: VehicleController3D
 
 
 func _physics_process(delta: float) -> void:
-	# global_position_offset = to_global(position - Vector3(0.0, VERTICAL_OFFSET, 0.0))
+	# global_position_offset = to_global(position - Vector3(0.0, parent.settings.vertical_offset, 0.0))
 	velocity_at_wheel = get_velocity_at(to_global(wheel_origin))
 	total_forces = Vector3.ZERO
 	if is_colliding():
@@ -126,7 +123,7 @@ func initialize() -> void:
 	# Set up raycast
 	collision_mask = parent.settings.ground_layer
 	# Set the max distance the raycast should look
-	target_position = Vector3(0.0, -(VERTICAL_OFFSET + parent.settings.spring_rest_dist + parent.settings.wheel_radius), 0.0)
+	target_position = Vector3(0.0, -(parent.settings.vertical_offset + parent.settings.spring_rest_dist + parent.settings.wheel_radius), 0.0)
 
 	# At this point, front_back and left_right have been set, so set the spring strength and grip curve
 	spring_strength = (
@@ -142,10 +139,10 @@ func initialize() -> void:
 
 	# Apply vertical offset to fix issue with bottoming out
 	wheel_origin = position
-	position.y += VERTICAL_OFFSET
-	# global_position_offset = to_global(position - Vector3(0.0, VERTICAL_OFFSET, 0.0))
+	position.y += parent.settings.vertical_offset
+	# global_position_offset = to_global(position - Vector3(0.0, parent.settings.vertical_offset, 0.0))
 	for child in get_children():
-		child.position.y -= VERTICAL_OFFSET
+		child.position.y -= parent.settings.vertical_offset
 
 
 #region Visuals - Wheel Mesh Position and Rotation

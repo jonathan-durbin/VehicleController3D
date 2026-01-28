@@ -1,5 +1,5 @@
+class_name VehicleController3D
 extends RigidBody3D
-class_name Vehicle
 
 
 @export var debug: bool = false:
@@ -15,17 +15,17 @@ class_name Vehicle
 #@export var settings: VehicleSettings
 @export var input_vehicle_acceleration: GUIDEAction
 @export var input_vehicle_steering: GUIDEAction
-@export var settings: VehicleSettings
+@export var settings: VehicleControllerSettings
 
 #@export_group("Nodes")
-#@export var wheel_nodes: Array[VehicleWheel] = []
-# @export var front_right: VehicleWheel
-# @export var front_left: VehicleWheel
-# @export var back_right: VehicleWheel
-# @export var back_left: VehicleWheel
+#@export var wheel_nodes: Array[VehicleController3DWheel] = []
+# @export var front_right: VehicleController3DWheel
+# @export var front_left: VehicleController3DWheel
+# @export var back_right: VehicleController3DWheel
+# @export var back_left: VehicleController3DWheel
 
 
-var wheels: Dictionary[String, VehicleWheel] = {}
+var wheels: Dictionary[String, VehicleController3DWheel] = {}
 var body_length: float
 var axle_length: float
 var local_velocity: Vector3
@@ -46,7 +46,7 @@ func _ready() -> void:
 	_calculate_body_axle_length()
 
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not _has_required_inputs():
 		return
 	if not initial_position_set:
@@ -77,6 +77,7 @@ func _process(delta: float) -> void:
 
 
 #region Initial Position Calculation
+
 func _try_set_initial_position() -> void:
 	var start_pos: Vector3 = _query_initial_position()
 	if start_pos.is_finite():
@@ -101,29 +102,33 @@ func _query_initial_position() -> Vector3:
 
 
 #region Utility
+
 ## Calculates the Ackermann angle given wheel rotation and what side of the vehicle we're considering
 func ackermann_angle(steering_rotation: float, axle_sign: float) -> float:
 	return atan(body_length/(body_length/tan(steering_rotation)+(axle_sign*axle_length)/2.0))
-
 
 #endregion
 
 
 #region Initialization
+
 func _initialize_wheels() -> void:
+	var wheel_nodes: Array[VehicleController3DWheel] = []
+	wheel_nodes.assign(find_children("*", "VehicleController3DWheel"))
+	
 	if wheel_nodes.is_empty():
 		push_error("No wheel nodes assigned to Vehicle.")
 		return
+		
 	# Assuming the vehicle is facing in the Vector3.FORWARD (negative Z) direction, we can iterate over each wheel and determine what side it's on.
 	# (From vehicle's perspective)
 	#    Negative X -> Left of vehicle
 	#    Positive X -> Right of vehicle
 	#    Largest Z -> Furthest back
 	#    Smallest Z -> Furthest front
-	var wheel_nodes: Array[VehicleWheel] = []
-	wheel_nodes.assign(find_children("*", "VehicleWheel"))
-	var left_wheels: Array[VehicleWheel] = []
-	var right_wheels: Array[VehicleWheel] = []
+	var left_wheels: Array[VehicleController3DWheel] = []
+	var right_wheels: Array[VehicleController3DWheel] = []
+	
 	for wheel in wheel_nodes:
 		if is_zero_approx(wheel.position.x):
 			push_warning("Wheel is centered on X; defaulting to right side: %s" % wheel.name)
@@ -139,10 +144,10 @@ func _initialize_wheels() -> void:
 		push_error("Wheel nodes must include at least two wheels per side.")
 		return
 
-	left_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+	left_wheels.sort_custom(func(a: VehicleController3DWheel, b: VehicleController3DWheel) -> bool:
 		return a.position.z < b.position.z
 	)
-	right_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+	right_wheels.sort_custom(func(a: VehicleController3DWheel, b: VehicleController3DWheel) -> bool:
 		return a.position.z < b.position.z
 	)
 
@@ -172,19 +177,19 @@ func _initialize_wheels() -> void:
 		if "F" in wheel_key:
 			if settings.drive_type == settings.DriveType.FWD or settings.drive_type == settings.DriveType.AWD:
 				wheels[wheel_key].is_powered = true
-			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.FRONT
+			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.FRONT
 		elif "B" in wheel_key:
 			if settings.drive_type == settings.DriveType.RWD or settings.drive_type == settings.DriveType.AWD:
 				wheels[wheel_key].is_powered = true
-			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.BACK
+			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.BACK
 		else:
-			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.NONE
+			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.NONE
 
 		# Set wheel's left-right variable
 		if "R" in wheel_key:
-			wheels[wheel_key].left_right = VehicleWheel.LeftRightType.RIGHT
+			wheels[wheel_key].left_right = VehicleController3DWheel.LeftRightType.RIGHT
 		else:
-			wheels[wheel_key].left_right = VehicleWheel.LeftRightType.LEFT
+			wheels[wheel_key].left_right = VehicleController3DWheel.LeftRightType.LEFT
 
 		wheels[wheel_key].initialize()
 
@@ -203,8 +208,6 @@ func _calculate_body_axle_length() -> void:
 		) / 2.0
 	)
 
-#endregion
-
 
 func _has_required_inputs() -> bool:
 	if settings == null:
@@ -217,3 +220,5 @@ func _has_required_inputs() -> bool:
 		push_error("Vehicle wheels are not initialized.")
 		return false
 	return true
+
+#endregion
