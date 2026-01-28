@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://em4ybmol1p6e"]
+[gd_scene load_steps=31 format=3 uid="uid://em4ybmol1p6e"]
 
 [ext_resource type="Script" uid="uid://bxdopcdy10bft" path="res://testing/test_scene.gd" id="1_j3auj"]
 [ext_resource type="Script" uid="uid://t5scchmom10k" path="res://addons/VehicleController3D/src/vehicle.gd" id="2_og0bn"]
@@ -6,6 +6,19 @@
 [ext_resource type="Resource" uid="uid://dl2fm4uxhuarh" path="res://testing/input/vehicle_steer.tres" id="4_exd2m"]
 [ext_resource type="Script" uid="uid://cx4koy8yl7w0s" path="res://addons/VehicleController3D/src/vehicle_settings.gd" id="5_0n46t"]
 [ext_resource type="Script" uid="uid://bgryusqka83s" path="res://addons/VehicleController3D/src/vehicle_wheel.gd" id="6_1sm0y"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_j3auj"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_og0bn"]
+sky_material = SubResource("ProceduralSkyMaterial_j3auj")
+
+[sub_resource type="Environment" id="Environment_y6yo6"]
+background_mode = 2
+sky = SubResource("Sky_og0bn")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_rc4ay"]
 
@@ -67,6 +80,7 @@ curve = SubResource("Curve_8gaq3")
 
 [sub_resource type="Resource" id="Resource_hv4vj"]
 script = ExtResource("5_0n46t")
+wheel_radius = 0.2
 ground_layer = 1
 power_curve = SubResource("CurveTexture_hv4vj")
 front_wheel_grip_curve = SubResource("CurveTexture_y6yo6")
@@ -80,10 +94,34 @@ size = Vector3(1.05, 0.535, 1.73)
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_j3auj"]
 points = PackedVector3Array(0.525, 0.2675, 0.865, 0.525, -0.2675, 0.865, 0.525, 0.2675, -0.865, -0.525, 0.2675, 0.865, -0.525, -0.2675, 0.865, 0.525, -0.2675, -0.865, -0.525, 0.2675, -0.865, -0.525, -0.2675, -0.865)
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_j3auj"]
+frequency = 0.0066
+fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_og0bn"]
+noise = SubResource("FastNoiseLite_j3auj")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y6yo6"]
+albedo_texture = SubResource("NoiseTexture2D_og0bn")
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_exd2m"]
+material = SubResource("StandardMaterial3D_y6yo6")
+top_radius = 0.2
+bottom_radius = 0.2
+height = 0.079
+
 [node name="TestScene" type="Node3D"]
 script = ExtResource("1_j3auj")
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_y6yo6")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
 [node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4963846, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 visible = false
@@ -126,24 +164,43 @@ visible = false
 shape = SubResource("ConvexPolygonShape3D_j3auj")
 
 [node name="VehicleWheel3D" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53019845, -0.17540109, 0.59899086)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53, -0.26, 0.599)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D"]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_exd2m")
 
 [node name="VehicleWheel3D2" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53019845, -0.17540109, -0.56705064)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53019845, -0.26, -0.56705064)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D2"]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_exd2m")
+skeleton = NodePath("../../VehicleWheel3D")
 
 [node name="VehicleWheel3D3" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.17540109, 0.59899086)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.26, 0.59899086)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
 
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D3"]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_exd2m")
+skeleton = NodePath("../../VehicleWheel3D")
+
 [node name="VehicleWheel3D4" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.17540109, -0.56705064)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.26, -0.56705064)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D4"]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_exd2m")
+skeleton = NodePath("../../VehicleWheel3D")
 
 [node name="Camera3D" type="Camera3D" parent="VehicleBody3D"]
 transform = Transform3D(0.9999446, 0.0054043643, -0.009030824, 0, 0.8580847, 0.5135082, 0.010524397, -0.51347977, 0.8580372, -0.04914554, 2.2446961, 4.669419)
