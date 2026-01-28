@@ -1,16 +1,20 @@
+## Visual debug gizmo that renders axis force indicators.
 extends Node3D
 class_name Gizmo3D
 
 
+## Mesh instances keyed by axis name.
 var axes: Dictionary[String, MeshInstance3D] = {}
 
 
+## Creates axis meshes when the gizmo enters the scene tree.
 func _ready() -> void:
 	_create_axis_mesh("x")
 	_create_axis_mesh("y")
 	_create_axis_mesh("z")
 
 
+## Sets the axis mesh length and offset based on a force magnitude.
 func set_targetf(axis: String, target: float) -> void:
 	var _axis: String = axis.to_lower()
 	if _axis not in axes.keys():
@@ -28,6 +32,7 @@ func set_targetf(axis: String, target: float) -> void:
 			axes[_axis].mesh.height = absf(target)
 
 
+## Builds a colored cylinder mesh to represent an axis direction.
 func _create_axis_mesh(axis: String) -> void:
 	# Create mesh and shape
 	var mesh := MeshInstance3D.new()
