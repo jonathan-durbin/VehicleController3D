@@ -2,6 +2,8 @@ class_name VehicleWheel
 extends RayCast3D
 ## Raycast vehicle wheel node.
 
+const MIN_DELTA: float = 0.0001
+
 enum FrontBackType {
 	FRONT,
 	BACK,
@@ -118,6 +120,8 @@ func initialize() -> void:
 		if "wheel" in child.name.to_lower():
 			wheel_meshinstance = child
 			break
+	if wheel_meshinstance == null:
+		push_warning("VehicleWheel mesh instance not found; visual wheel updates will be skipped.")
 
 	# Set up raycast
 	collision_mask = parent.settings.ground_layer
@@ -146,10 +150,14 @@ func initialize() -> void:
 
 #region Visuals - Wheel Mesh Position and Rotation
 func set_wheel_height(value: float, delta: float) -> void:
+	if wheel_meshinstance == null:
+		return
 	wheel_meshinstance.position.y = lerpf(wheel_meshinstance.position.y, value, 20.0 * delta)
 
 
 func rotate_wheel(delta: float):
+	if wheel_meshinstance == null:
+		return
 	var dir: Vector3 = parent.basis.z
 	var rotation_dir: float = 1 if parent.linear_velocity.dot(dir) > 0.0 else -1
 	wheel_meshinstance.rotate_x(rotation_dir * parent.linear_velocity.length() * delta)
@@ -159,6 +167,7 @@ func rotate_wheel(delta: float):
 
 #region Suspension
 func handle_suspension(delta: float, collision_point: Vector3) -> void:
+	var safe_delta := maxf(delta, MIN_DELTA)
 	# Direction the suspension force will be applied
 	var suspension_dir: Vector3 = global_basis.y
 	var distance: float = collision_point.distance_to(to_global(wheel_origin))
@@ -168,7 +177,7 @@ func handle_suspension(delta: float, collision_point: Vector3) -> void:
 		0.0, parent.settings.spring_rest_dist # Spring length should only be between 0.0 and spring_rest_dist
 	)
 
-	var spring_velocity: float = (previous_spring_length - spring_length) / delta # Movement per time
+	var spring_velocity: float = (previous_spring_length - spring_length) / safe_delta # Movement per time
 	previous_spring_length = spring_length
 
 	var damp_force: float = parent.settings.spring_damp * spring_velocity
@@ -201,8 +210,9 @@ func handle_acceleration(_delta: float, _collision_point: Vector3) -> void:
 	var accel_dir = -global_basis.z
 	var forward_speed: float = accel_dir.dot(velocity_at_wheel)
 
+	var max_speed := maxf(parent.settings.max_forward_speed, 0.001)
 	var normalized_speed: float = clampf(
-		absf(forward_speed) / parent.settings.max_forward_speed,
+		absf(forward_speed) / max_speed,
 		0.0, 1.0
 	)
 
@@ -230,6 +240,7 @@ func handle_acceleration(_delta: float, _collision_point: Vector3) -> void:
 
 #region Steering
 func handle_steering(delta: float, collision_point: Vector3) -> void:
+	var safe_delta := maxf(delta, MIN_DELTA)
 	var axle_dir: Vector3 = global_basis.x
 	var lateral_speed: float = axle_dir.dot(velocity_at_wheel)
 
@@ -240,7 +251,7 @@ func handle_steering(delta: float, collision_point: Vector3) -> void:
 	))
 
 	var velocity_change: float = -lateral_speed * grip
-	var accel: float = velocity_change / delta # Divide by time to get acceleration (m/s/s)
+	var accel: float = velocity_change / safe_delta # Divide by time to get acceleration (m/s/s)
 
 	total_forces.x = clampf(
 		accel * parent.mass,

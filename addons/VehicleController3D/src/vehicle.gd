@@ -47,6 +47,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if not _has_required_inputs():
+		return
 	if not initial_position_set:
 		_try_set_initial_position()
 		return
@@ -104,65 +106,57 @@ func ackermann_angle(steering_rotation: float, axle_sign: float) -> float:
 	return atan(body_length/(body_length/tan(steering_rotation)+(axle_sign*axle_length)/2.0))
 
 
-## Returns a callable to be used in the Array.reduce method.
-## Used when you want to find the key pointing to the largest value
-## Expected dictionary data type should be Dictionary[Variant, float]
-func reduce_max_key(d: Dictionary) -> Callable:
-	return (
-		func(acc, key):
-		if acc == null:
-			return key
-		return key if d[key] > d[acc] else acc
-	)
-
-
-## Returns a callable to be used in the Array.reduce method.
-## Used when you want to find the key pointing to the smallest value
-## Expected dictionary data type should be Dictionary[Variant, float]
-func reduce_min_key(d: Dictionary) -> Callable:
-	return (
-		func(acc, key):
-		if acc == null:
-			return key
-		return key if d[key] < d[acc] else acc
-	)
-
 #endregion
 
 
 #region Initialization
 func _initialize_wheels() -> void:
+	if wheel_nodes.is_empty():
+		push_error("No wheel nodes assigned to Vehicle.")
+		return
 	# Assuming the vehicle is facing in the Vector3.FORWARD (negative Z) direction, we can iterate over each wheel and determine what side it's on.
 	# (From vehicle's perspective)
 	#    Negative X -> Left of vehicle
 	#    Positive X -> Right of vehicle
 	#    Largest Z -> Furthest back
 	#    Smallest Z -> Furthest front
-	var left_z: Dictionary[VehicleWheel, float] = {}
-	var right_z: Dictionary[VehicleWheel, float] = {}
+	var left_wheels: Array[VehicleWheel] = []
+	var right_wheels: Array[VehicleWheel] = []
 	for wheel in wheel_nodes:
-		if is_equal_approx(signf(wheel.position.x), -1.0):
-			left_z[wheel] = wheel.position.z
+		if is_zero_approx(wheel.position.x):
+			push_warning("Wheel is centered on X; defaulting to right side: %s" % wheel.name)
+		if wheel.position.x < 0.0:
+			left_wheels.append(wheel)
 		else:
-			right_z[wheel] = wheel.position.z
+			right_wheels.append(wheel)
+
+	if left_wheels.is_empty() or right_wheels.is_empty():
+		push_error("Wheel nodes must include both left and right wheels.")
+		return
+	if left_wheels.size() < 2 or right_wheels.size() < 2:
+		push_error("Wheel nodes must include at least two wheels per side.")
+		return
+
+	left_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+		return a.position.z < b.position.z
+	)
+	right_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+		return a.position.z < b.position.z
+	)
 
 	# Set the four primary wheels
-	wheels["B-L"] = left_z.keys().reduce(reduce_max_key(left_z))
-	wheels["F-L"] = left_z.keys().reduce(reduce_min_key(left_z))
-	wheels["B-R"] = right_z.keys().reduce(reduce_max_key(right_z))
-	wheels["F-R"] = right_z.keys().reduce(reduce_min_key(right_z))
+	wheels["F-L"] = left_wheels.front()
+	wheels["B-L"] = left_wheels.back()
+	wheels["F-R"] = right_wheels.front()
+	wheels["B-R"] = right_wheels.back()
 
 	# Fill in the rest of the wheels
 	var wheel_num: int = 0
-	for wheel in wheel_nodes:
-		if wheel in wheels.values():
-			continue
-		var wheel_key: String = "M" + str(wheel_num)
-		if is_equal_approx(signf(wheel.position.x), -1.0):
-			wheel_key = wheel_key + "-L"
-		else:
-			wheel_key = wheel_key + "-R"
-		wheels[wheel_key] = wheel
+	for idx in range(1, left_wheels.size() - 1):
+		wheels["M" + str(wheel_num) + "-L"] = left_wheels[idx]
+		wheel_num += 1
+	for idx in range(1, right_wheels.size() - 1):
+		wheels["M" + str(wheel_num) + "-R"] = right_wheels[idx]
 		wheel_num += 1
 
 	# Sanity check
@@ -194,6 +188,8 @@ func _initialize_wheels() -> void:
 
 
 func _calculate_body_axle_length() -> void:
+	if not wheels.has("F-R") or not wheels.has("F-L") or not wheels.has("B-R") or not wheels.has("B-L"):
+		return
 	body_length = ((
 			wheels["F-R"].global_position.distance_to(wheels["B-R"].global_position) +
 			wheels["F-L"].global_position.distance_to(wheels["B-L"].global_position)
@@ -206,3 +202,16 @@ func _calculate_body_axle_length() -> void:
 	)
 
 #endregion
+
+
+func _has_required_inputs() -> bool:
+	if settings == null:
+		push_error("Vehicle settings are missing.")
+		return false
+	if input_vehicle_acceleration == null or input_vehicle_steering == null:
+		push_error("Vehicle input actions are missing.")
+		return false
+	if not wheels.has("F-R") or not wheels.has("F-L") or not wheels.has("B-R") or not wheels.has("B-L"):
+		push_error("Vehicle wheels are not initialized.")
+		return false
+	return true
