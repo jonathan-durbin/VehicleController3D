@@ -1,0 +1,11 @@
+# Normalize EOL for all files that Git considers text files.
+* text=auto eol=lf
+
+
+# Exclude all top-level files and directories (except addons) from ZIP downloads.
+# This makes installing through the AssetLib easier, because no files and folders
+# need to be unchecked.
+/**         export-ignore
+/addons    !export-ignore
+/addons/guide export-ignore
+/addons/** !export-ignore
