@@ -17,8 +17,8 @@ class_name Vehicle
 @export var input_vehicle_steering: GUIDEAction
 @export var settings: VehicleSettings
 
-@export_group("Nodes")
-@export var wheel_nodes: Array[VehicleWheel] = []
+#@export_group("Nodes")
+#@export var wheel_nodes: Array[VehicleWheel] = []
 # @export var front_right: VehicleWheel
 # @export var front_left: VehicleWheel
 # @export var back_right: VehicleWheel
@@ -138,6 +138,8 @@ func _initialize_wheels() -> void:
 	#    Positive X -> Right of vehicle
 	#    Largest Z -> Furthest back
 	#    Smallest Z -> Furthest front
+	var wheel_nodes: Array[VehicleWheel] = []
+	wheel_nodes.assign(find_children("*", "VehicleWheel"))
 	var left_z: Dictionary[VehicleWheel, float] = {}
 	var right_z: Dictionary[VehicleWheel, float] = {}
 	for wheel in wheel_nodes:
