@@ -82,6 +82,7 @@ curve = SubResource("Curve_8gaq3")
 script = ExtResource("5_0n46t")
 wheel_radius = 0.2
 ground_layer = 1
+engine_power = 50.0
 power_curve = SubResource("CurveTexture_hv4vj")
 front_wheel_grip_curve = SubResource("CurveTexture_y6yo6")
 rear_wheel_grip_curve = SubResource("CurveTexture_m1fae")
@@ -109,6 +110,7 @@ material = SubResource("StandardMaterial3D_y6yo6")
 top_radius = 0.2
 bottom_radius = 0.2
 height = 0.079
+radial_segments = 15
 
 [node name="TestScene" type="Node3D"]
 script = ExtResource("1_j3auj")
@@ -143,11 +145,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
 mesh = SubResource("PlaneMesh_q3vq8")
 
 [node name="VehicleBody3D" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54980403, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.1473823, 0.5428602, -17.193644)
 mass = 15.0
 physics_material_override = SubResource("PhysicsMaterial_j3auj")
 center_of_mass_mode = 1
-center_of_mass = Vector3(0, -1, 0)
+center_of_mass = Vector3(0, -1, 0.25)
 can_sleep = false
 script = ExtResource("2_og0bn")
 debug = true
@@ -160,47 +162,46 @@ metadata/_custom_type_script = "uid://t5scchmom10k"
 mesh = SubResource("BoxMesh_7dpxd")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="VehicleBody3D"]
-visible = false
 shape = SubResource("ConvexPolygonShape3D_j3auj")
 
 [node name="VehicleWheel3D" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53, -0.26, 0.599)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9861059, -0.26, 0.9038639)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D"]
+[node name="WheelMeshInstance3D" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_exd2m")
 
 [node name="VehicleWheel3D2" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.53019845, -0.26, -0.56705064)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9863043, -0.26, -0.9844227)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D2"]
+[node name="WheelMeshInstance3D2" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D2"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_exd2m")
 skeleton = NodePath("../../VehicleWheel3D")
 
 [node name="VehicleWheel3D3" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.26, 0.59899086)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0008521, -0.26, 0.90385246)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D3"]
+[node name="WheelMeshInstance3D3" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D3"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_exd2m")
 skeleton = NodePath("../../VehicleWheel3D")
 
 [node name="VehicleWheel3D4" type="RayCast3D" parent="VehicleBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5321255, -0.26, -0.56705064)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0008521, -0.26, -0.9844227)
 script = ExtResource("6_1sm0y")
 metadata/_custom_type_script = "uid://bgryusqka83s"
 
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D4"]
+[node name="WheelMeshInstance3D4" type="MeshInstance3D" parent="VehicleBody3D/VehicleWheel3D4"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_exd2m")
 skeleton = NodePath("../../VehicleWheel3D")
 
 [node name="Camera3D" type="Camera3D" parent="VehicleBody3D"]
-transform = Transform3D(0.9999446, 0.0054043643, -0.009030824, 0, 0.8580847, 0.5135082, 0.010524397, -0.51347977, 0.8580372, -0.04914554, 2.2446961, 4.669419)
+transform = Transform3D(0.8100721, -0.04496011, 0.58460397, 0, 0.9970557, 0.07668052, -0.58633035, -0.062116746, 0.807687, 1.7188139, 0.225451, 2.3747082)
