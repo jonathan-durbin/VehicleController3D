@@ -21,4 +21,4 @@ GUIDE="*res://addons/guide/guide.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/VehicleController3D/plugin.cfg", "res://addons/guide/plugin.cfg")
+enabled=PackedStringArray("res://addons/FirstPersonController3D/plugin.cfg", "res://addons/VehicleController3D/plugin.cfg", "res://addons/guide/plugin.cfg")

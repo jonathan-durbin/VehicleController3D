@@ -42,15 +42,6 @@ var local_velocity: Vector3
 var initial_position_set: bool = false
 
 
-# var steering_input: float
-# var accel_input: float
-# var wheels: Dictionary[String, CarWheel] = {}
-# var body_length: float
-# var axle_length: float
-# var local_velocity: Vector3
-# var initial_position_set: bool = false
-
-
 ## Initializes wheels and derives vehicle dimensions on ready.
 func _ready() -> void:
 	_initialize_wheels()
@@ -67,7 +58,7 @@ func _physics_process(delta: float) -> void:
 
 	# Take the vehicle's rotation out of its velocity.
 	# For example, if local_velocity.x is positive, the vehicle is moving right. If negative, it's moving left.
-	local_velocity = global_transform.basis.inverse() * linear_velocity
+	#local_velocity = global_transform.basis.inverse() * linear_velocity
 
 	# Between steering_angle and -steering_angle (before converting to radians)
 	# Negate because positive Y rotation is counter-clockwise by default
@@ -198,7 +189,7 @@ func _initialize_wheels() -> void:
 				wheels[wheel_key].is_powered = true
 			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.BACK
 		else:
-			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.NONE
+			wheels[wheel_key].front_back = VehicleController3DWheel.FrontBackType.MIDDLE
 
 		# Set wheel's left-right variable
 		if "R" in wheel_key:
