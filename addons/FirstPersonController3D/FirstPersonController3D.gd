@@ -214,6 +214,12 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_mouse_delta += event.relative
+	if event.is_action_pressed("ui_cancel"):
+		Input.mouse_mode = (
+			Input.MOUSE_MODE_VISIBLE 
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED 
+			else Input.MOUSE_MODE_CAPTURED
+		)
 
 
 #region State
