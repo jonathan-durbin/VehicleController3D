@@ -1,0 +1,130 @@
+[gd_scene load_steps=13 format=3 uid="uid://bl8eh8uuc74s0"]
+
+[ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D_New/VehicleController3D_New.tscn" id="1_qyovt"]
+[ext_resource type="Script" uid="uid://ouopvrljiaxc" path="res://addons/FirstPersonController3D/FirstPersonController3D.gd" id="2_1vc0j"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1vc0j"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_yw8bi"]
+sky_material = SubResource("ProceduralSkyMaterial_1vc0j")
+
+[sub_resource type="Environment" id="Environment_y882s"]
+background_mode = 2
+sky = SubResource("Sky_yw8bi")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_1vc0j"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_yw8bi"]
+noise_type = 2
+frequency = 0.0208
+fractal_type = 0
+cellular_distance_function = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_y882s"]
+generate_mipmaps = false
+noise = SubResource("FastNoiseLite_yw8bi")
+seamless = true
+as_normal_map = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g0yjs"]
+albedo_color = Color(0.3328807, 0.33288068, 0.33288068, 1)
+normal_enabled = true
+normal_texture = SubResource("NoiseTexture2D_y882s")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_4gqbk"]
+material = SubResource("StandardMaterial3D_g0yjs")
+size = Vector2(20, 20)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw8bi"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1vc0j"]
+
+[node name="NewTestScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_y882s")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="VehicleController3DNew" parent="." instance=ExtResource("1_qyovt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7679205, 1.8943691, 10.674698)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("WorldBoundaryShape3D_1vc0j")
+
+[node name="GroundMeshes" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="GroundMeshes"]
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="GroundMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
+mesh = SubResource("PlaneMesh_4gqbk")
+skeleton = NodePath("../..")
+
+[node name="FirstPersonController3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("head", "camera")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.186981, 0.52757955, 10.674698)
+script = ExtResource("2_1vc0j")
+enable_sprint = false
+enable_crouch = false
+head = NodePath("Head")
+camera = NodePath("Head/Camera3D")
+jump_velocity = 10.0
+metadata/_custom_type_script = "uid://ouopvrljiaxc"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FirstPersonController3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
+shape = SubResource("CapsuleShape3D_yw8bi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FirstPersonController3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
+mesh = SubResource("CapsuleMesh_1vc0j")
+
+[node name="Head" type="Node3D" parent="FirstPersonController3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4880059, 0)
+
+[node name="Camera3D" type="Camera3D" parent="FirstPersonController3D/Head"]
