@@ -2,9 +2,25 @@ class_name Vehicle
 extends RigidBody3D
 
 
-@export var debug: bool = false
+enum DriveType {AWD, FWD, RWD}
+
+const GLOBAL_CTX: GUIDEMappingContext = preload("uid://c2hrb2jqlkrmw")
+
+
+@export var debug: bool = false:
+	set(value):
+		debug = value
+		for wheel in wheels.values():
+			if is_instance_valid(wheel):
+				wheel.debug = debug
+
+@export var acceleration: float = 300.0
+@export var drive_type: DriveType = DriveType.RWD
+@export var input_accelerate: GUIDEAction
+
 
 ## Lookup of wheels by key (F-L, F-R, etc.).
+## If there are any middle wheels, those would be M1-R, M1-L, etc. In order from front to back.
 var wheels: Dictionary[String, VehicleWheel] = {}
 ## Distance between front and rear axle centers.
 var body_length: float
@@ -14,10 +30,9 @@ var axle_length: float
 
 ## Initializes wheels and derives vehicle dimensions on ready.
 func _ready() -> void:
+	GUIDE.enable_mapping_context(GLOBAL_CTX)
 	_initialize_wheels()
 	_calculate_body_axle_length()
-
-
 
 
 ## Finds wheel nodes, assigns roles, and initializes wheel state.
@@ -81,24 +96,24 @@ func _initialize_wheels() -> void:
 
 	# Set debug, is_powered, and other variables
 	for wheel_key in wheels.keys():
-	# 	wheels[wheel_key].debug = debug
-	# 	# Set wheel's front-back variable (and the is_powered variable)
-	# 	if "F" in wheel_key:
-	# 		if settings.drive_type == settings.DriveType.FWD or settings.drive_type == settings.DriveType.AWD:
-	# 			wheels[wheel_key].is_powered = true
-	# 		wheels[wheel_key].front_back = VehicleWheel.FrontBackType.FRONT
-	# 	elif "B" in wheel_key:
-	# 		if settings.drive_type == settings.DriveType.RWD or settings.drive_type == settings.DriveType.AWD:
-	# 			wheels[wheel_key].is_powered = true
-	# 		wheels[wheel_key].front_back = VehicleWheel.FrontBackType.BACK
-	# 	else:
-	# 		wheels[wheel_key].front_back = VehicleWheel.FrontBackType.MIDDLE
+		wheels[wheel_key].debug = debug
+		# Set wheel's front-back variable (and the is_powered variable)
+		if "F" in wheel_key:
+			if drive_type == DriveType.FWD or drive_type == DriveType.AWD:
+				wheels[wheel_key].is_powered = true
+			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.FRONT
+		elif "B" in wheel_key:
+			if drive_type == DriveType.RWD or drive_type == DriveType.AWD:
+				wheels[wheel_key].is_powered = true
+			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.BACK
+		else:
+			wheels[wheel_key].front_back = VehicleWheel.FrontBackType.MIDDLE
 
-	# 	# Set wheel's left-right variable
-	# 	if "R" in wheel_key:
-	# 		wheels[wheel_key].left_right = VehicleWheel.LeftRightType.RIGHT
-	# 	else:
-	# 		wheels[wheel_key].left_right = VehicleWheel.LeftRightType.LEFT
+		# Set wheel's left-right variable
+		if "R" in wheel_key:
+			wheels[wheel_key].left_right = VehicleWheel.LeftRightType.RIGHT
+		else:
+			wheels[wheel_key].left_right = VehicleWheel.LeftRightType.LEFT
 
 		wheels[wheel_key].initialize()
 

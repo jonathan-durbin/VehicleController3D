@@ -64,6 +64,7 @@ shape = SubResource("BoxShape3D_qke2f")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9984913, 1.1920929e-07, 1.7627484)
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
+spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelBR"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
@@ -73,6 +74,7 @@ mesh = SubResource("CylinderMesh_v4xlo")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.998, 0, 1.763)
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
+spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelBL"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
@@ -82,6 +84,7 @@ mesh = SubResource("CylinderMesh_v4xlo")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9984913, 1.1920929e-07, -1.6343957)
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
+spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelFR"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
@@ -91,6 +94,7 @@ mesh = SubResource("CylinderMesh_v4xlo")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.998, 0, -1.6341441)
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
+spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelFL"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)

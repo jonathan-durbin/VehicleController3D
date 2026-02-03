@@ -1,10 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://46r01gmhn5my"]
+[gd_scene load_steps=20 format=3 uid="uid://46r01gmhn5my"]
 
 [ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_4xob4"]
 [ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D_New/VehicleController3D_New.tscn" id="1_qyovt"]
 [ext_resource type="Script" uid="uid://ouopvrljiaxc" path="res://addons/FirstPersonController3D/FirstPersonController3D.gd" id="2_1vc0j"]
 [ext_resource type="Texture2D" uid="uid://epm5r750pnlv" path="res://addons/PrototypeKenneyMaterials-main/black/texture_02.png" id="2_4gqbk"]
 [ext_resource type="Texture2D" uid="uid://dfrlu6a61h56f" path="res://addons/PrototypeKenneyMaterials-main/texture_02_normal.png" id="3_4xob4"]
+[ext_resource type="Resource" uid="uid://df2setcnjy8fk" path="res://testing/input/vehicle_accelerate.tres" id="3_eei0l"]
 [ext_resource type="Texture2D" uid="uid://bfaxc2f6gjgvb" path="res://addons/PrototypeKenneyMaterials-main/purple/texture_01.png" id="5_eei0l"]
 [ext_resource type="Texture2D" uid="uid://fom3snsu0i5h" path="res://addons/PrototypeKenneyMaterials-main/texture_01_normal.png" id="6_hme1e"]
 
@@ -68,6 +69,8 @@ exclude = [NodePath("../FirstPersonController3D")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7679205, 1.8943691, 10.674698)
 mass = 25.0
 center_of_mass = Vector3(0, -1.1, 0.15)
+debug = true
+input_accelerate = ExtResource("3_eei0l")
 
 [node name="Ground" type="StaticBody3D" parent="."]
 
