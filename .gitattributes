@@ -8,5 +8,5 @@
 /**         export-ignore
 /addons    !export-ignore
 /addons/** export-ignore
-/addons/VehicleController3D !export-ignore
+/addons/VehicleController3D/** !export-ignore
 
