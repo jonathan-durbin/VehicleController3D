@@ -14,7 +14,21 @@ const GLOBAL_CTX: GUIDEMappingContext = preload("uid://c2hrb2jqlkrmw")
 			if is_instance_valid(wheel):
 				wheel.debug = debug
 
-@export var acceleration: float = 300.0
+## spring_damp_coefficient * (2.0 * sqrt(spring_strength * mass)).
+## Where spring_damp_coefficient is between 0 and 1.
+## More arcade-y: b/w 0.1 and 0.2. More realistic: b/w 0.2 and 1.0.
+## Where the wheel mesh rests relative to the origin of the raycast, downwards.
+## Actual spring damping is calculated in VehicleWheel.initialize()
+@export_range(0.0, 1.0, 0.001) var spring_damp_coefficient: float = 0.1:
+	set(value):
+		spring_damp_coefficient = value
+		for wheel in wheels.values():
+			if is_instance_valid(wheel):
+				wheel.calculate_spring_damping()
+@export_range(0.0, 1000.0, 1.0) var engine_power: float = 300.0
+@export_range(0.0, 1000.0, 1.0) var deceleration: float = 100.0
+@export var engine_power_curve: Curve
+@export var max_speed: float = 10.0 # m/s
 @export var drive_type: DriveType = DriveType.RWD
 @export var input_accelerate: GUIDEAction
 
@@ -26,6 +40,7 @@ var wheels: Dictionary[String, VehicleWheel] = {}
 var body_length: float
 ## Distance between left and right wheels on an axle.
 var axle_length: float
+var grounded: bool = false
 
 
 ## Initializes wheels and derives vehicle dimensions on ready.
@@ -34,6 +49,14 @@ func _ready() -> void:
 	_initialize_wheels()
 	_calculate_body_axle_length()
 
+
+func _physics_process(_delta: float) -> void:
+	grounded = false
+	for wheel in wheels:
+		if wheels[wheel].is_colliding():
+			grounded = true
+	center_of_mass = Vector3.ZERO if grounded else Vector3.DOWN * 0.5
+	
 
 ## Finds wheel nodes, assigns roles, and initializes wheel state.
 func _initialize_wheels() -> void:
@@ -68,10 +91,12 @@ func _initialize_wheels() -> void:
 		push_error("Wheel nodes must include at least two wheels per side.")
 		return
 
-	left_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+	left_wheels.sort_custom(
+		func(a: VehicleWheel, b: VehicleWheel) -> bool:
 		return a.position.z < b.position.z
 	)
-	right_wheels.sort_custom(func(a: VehicleWheel, b: VehicleWheel) -> bool:
+	right_wheels.sort_custom(
+		func(a: VehicleWheel, b: VehicleWheel) -> bool:
 		return a.position.z < b.position.z
 	)
 
@@ -94,7 +119,7 @@ func _initialize_wheels() -> void:
 	if wheels.values().size() != wheel_nodes.size():
 		push_error("Wheel array size mismatch!")
 
-	# Set debug, is_powered, and other variables
+	# Set debug, is_powered, left/right, and front/back variables
 	for wheel_key in wheels.keys():
 		wheels[wheel_key].debug = debug
 		# Set wheel's front-back variable (and the is_powered variable)
@@ -121,6 +146,7 @@ func _initialize_wheels() -> void:
 ## Calculates body and axle lengths using wheel positions.
 func _calculate_body_axle_length() -> void:
 	if not wheels.has("F-R") or not wheels.has("F-L") or not wheels.has("B-R") or not wheels.has("B-L"):
+		push_error("Can't calculate body axle length, at least four wheels need to be defined")
 		return
 	body_length = ((
 			wheels["F-R"].global_position.distance_to(wheels["B-R"].global_position) +

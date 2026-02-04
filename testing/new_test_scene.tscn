@@ -1,8 +1,7 @@
-[gd_scene load_steps=20 format=3 uid="uid://46r01gmhn5my"]
+[gd_scene load_steps=18 format=3 uid="uid://46r01gmhn5my"]
 
 [ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_4xob4"]
 [ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D_New/VehicleController3D_New.tscn" id="1_qyovt"]
-[ext_resource type="Script" uid="uid://ouopvrljiaxc" path="res://addons/FirstPersonController3D/FirstPersonController3D.gd" id="2_1vc0j"]
 [ext_resource type="Texture2D" uid="uid://epm5r750pnlv" path="res://addons/PrototypeKenneyMaterials-main/black/texture_02.png" id="2_4gqbk"]
 [ext_resource type="Texture2D" uid="uid://dfrlu6a61h56f" path="res://addons/PrototypeKenneyMaterials-main/texture_02_normal.png" id="3_4xob4"]
 [ext_resource type="Resource" uid="uid://df2setcnjy8fk" path="res://testing/input/vehicle_accelerate.tres" id="3_eei0l"]
@@ -22,6 +21,11 @@ sky = SubResource("Sky_yw8bi")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="Curve" id="Curve_4xob4"]
+_data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.3, 0.90000004), 0.0, 0.0, 0, 0, Vector2(0.6, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
+point_count = 4
+metadata/_snap_enabled = true
+
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_1vc0j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g0yjs"]
@@ -33,10 +37,6 @@ uv1_triplanar = true
 [sub_resource type="PlaneMesh" id="PlaneMesh_4gqbk"]
 material = SubResource("StandardMaterial3D_g0yjs")
 size = Vector2(20, 20)
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw8bi"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_1vc0j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goltg"]
 albedo_texture = ExtResource("5_eei0l")
@@ -63,13 +63,17 @@ shadow_enabled = true
 
 [node name="ClickPusher" type="Node" parent="." node_paths=PackedStringArray("exclude")]
 script = ExtResource("1_4xob4")
-exclude = [NodePath("../FirstPersonController3D")]
+exclude = [NodePath("")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.8796645, -0.2970239, 0.37143943, 0, 0.7809997, 0.6245314, -0.47559482, -0.5493781, 0.68701774, 12.853144, 27.718195, 51.369255)
 
 [node name="VehicleController3DNew" parent="." instance=ExtResource("1_qyovt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7679205, 1.8943691, 10.674698)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.52712, 1.8943686, 14.658297)
 mass = 25.0
-center_of_mass = Vector3(0, -1.1, 0.15)
 debug = true
+engine_power = 600.0
+engine_power_curve = SubResource("Curve_4xob4")
 input_accelerate = ExtResource("3_eei0l")
 
 [node name="Ground" type="StaticBody3D" parent="."]
@@ -124,32 +128,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
 mesh = SubResource("PlaneMesh_4gqbk")
 skeleton = NodePath("../..")
 
-[node name="FirstPersonController3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("head", "camera")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.186981, 0.52757955, 10.674698)
-script = ExtResource("2_1vc0j")
-enable_sprint = false
-enable_crouch = false
-enable_headbob = false
-head = NodePath("Head")
-camera = NodePath("Head/Camera3D")
-metadata/_custom_type_script = "uid://ouopvrljiaxc"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="FirstPersonController3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
-visible = false
-shape = SubResource("CapsuleShape3D_yw8bi")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="FirstPersonController3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
-mesh = SubResource("CapsuleMesh_1vc0j")
-
-[node name="Head" type="Node3D" parent="FirstPersonController3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4880059, 0)
-
-[node name="Camera3D" type="Camera3D" parent="FirstPersonController3D/Head"]
-
 [node name="Ramp" type="StaticBody3D" parent="."]
-transform = Transform3D(-0.7660668, 0, 0.64276093, 0, 1, 0, -0.64276093, 0, -0.7660668, 1.3567429, 1.0001874, -2.5830421)
+transform = Transform3D(-0.9062708, 0, 0.42269748, 0, 1, 0, -0.42269748, 0, -0.9062708, -3.0420227, 1.0001874, 1.7700639)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ramp"]
 transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)

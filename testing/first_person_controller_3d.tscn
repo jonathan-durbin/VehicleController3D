@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://d1yewexafcsr"]
+
+[ext_resource type="Script" uid="uid://ouopvrljiaxc" path="res://addons/FirstPersonController3D/FirstPersonController3D.gd" id="1_c3dmu"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw8bi"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1vc0j"]
+
+[node name="FirstPersonController3D" type="CharacterBody3D" node_paths=PackedStringArray("head", "camera")]
+script = ExtResource("1_c3dmu")
+enable_sprint = false
+enable_crouch = false
+enable_headbob = false
+head = NodePath("Head")
+camera = NodePath("Head/Camera3D")
+metadata/_custom_type_script = "uid://ouopvrljiaxc"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
+visible = false
+shape = SubResource("CapsuleShape3D_yw8bi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0000002, 0)
+mesh = SubResource("CapsuleMesh_1vc0j")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4880059, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
