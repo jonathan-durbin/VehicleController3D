@@ -187,7 +187,7 @@ func handle_suspension(delta: float, collision_point: Vector3) -> void:
 
 	var spring_length: float = clampf(
 		distance - parent.settings.wheel_radius, # Take the wheel radius out of the equation
-		0.0, parent.settings.spring_rest_dist 
+		0.0, parent.settings.spring_rest_dist
 	)
 
 	var spring_velocity: float = (previous_spring_length - spring_length) / safe_delta # Movement per time

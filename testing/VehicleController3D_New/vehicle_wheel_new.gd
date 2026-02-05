@@ -79,7 +79,7 @@ func _handle_suspension(delta: float) -> void:
 
 	var force_vector: Vector3 = total_forces.y * get_collision_normal()
 	var force_offset_pos: Vector3 = wheel_mesh.global_position - parent.global_position
-	
+
 	_set_debug_box("suspension_force_offset_pos", wheel_mesh.global_position, Color("b0e952"))
 
 	parent.apply_force(force_vector, force_offset_pos)
@@ -102,12 +102,12 @@ func _handle_acceleration() -> void:
 	
 	#var normal: Vector3 = get_collision_normal()
 	#var projected_vector: Vector3 = (force_vector - normal * force_vector.dot(normal))
-	
+
 	if is_powered:
 		_set_debug_box("accel_force_offset_pos", wheel_mesh.global_position+Vector3.ONE*0.01, Color("32a9f5"))
 
 	parent.apply_force(force_vector, force_offset_pos)
-	
+
 
 func initialize() -> void:
 	parent = get_parent()
