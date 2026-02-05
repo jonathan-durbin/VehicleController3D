@@ -21,8 +21,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		var to_exclude: Array[RID] = []
 
 		for i in exclude:
-			for c in i.find_children("*", "CollisionObject3D") + [i]:
-				to_exclude.append(c.get_rid())
+			if is_instance_valid(i):
+				for c in i.find_children("*", "CollisionObject3D") + [i]:
+					to_exclude.append(c.get_rid())
 		query.exclude = to_exclude
 
 		var res: Dictionary = state.intersect_ray(query)

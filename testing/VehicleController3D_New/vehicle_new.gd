@@ -26,11 +26,15 @@ const GLOBAL_CTX: GUIDEMappingContext = preload("uid://c2hrb2jqlkrmw")
 			if is_instance_valid(wheel):
 				wheel.calculate_spring_damping()
 @export_range(0.0, 1000.0, 1.0) var engine_power: float = 300.0
-@export_range(0.0, 1000.0, 1.0) var deceleration: float = 100.0
-@export var engine_power_curve: Curve
-@export var max_speed: float = 10.0 # m/s
 @export var drive_type: DriveType = DriveType.RWD
+@export var max_speed: float = 10.0 # m/s
+@export var tire_turn_speed_deg: float = 50.0
+@export var tire_max_turn_deg: float = 25.0
+@export var engine_power_curve: Curve
+@export var grip_curve: Curve
 @export var input_accelerate: GUIDEAction
+@export var input_steer: GUIDEAction
+@export var input_handbrake: GUIDEAction
 
 
 ## Lookup of wheels by key (F-L, F-R, etc.).
@@ -50,13 +54,32 @@ func _ready() -> void:
 	_calculate_body_axle_length()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	grounded = false
 	for wheel in wheels:
 		if wheels[wheel].is_colliding():
 			grounded = true
 	center_of_mass = Vector3.ZERO if grounded else Vector3.DOWN * 0.5
-	
+
+	_basic_steering_rotation(delta)
+
+
+func _basic_steering_rotation(delta: float) -> void:
+	var turn_input: float = input_steer.value_axis_1d * deg_to_rad(tire_turn_speed_deg) * delta
+
+	if input_steer.is_triggered():
+		wheels["F-L"].rotation.y = clampf(
+			wheels["F-L"].rotation.y + turn_input,
+			-deg_to_rad(tire_max_turn_deg), deg_to_rad(tire_max_turn_deg)
+		)
+		wheels["F-R"].rotation.y = clampf(
+			wheels["F-R"].rotation.y + turn_input,
+			-deg_to_rad(tire_max_turn_deg), deg_to_rad(tire_max_turn_deg)
+		)
+	else:
+		wheels["F-L"].rotation.y = move_toward(wheels["F-L"].rotation.y, 0.0, deg_to_rad(tire_turn_speed_deg) * delta)
+		wheels["F-R"].rotation.y = move_toward(wheels["F-R"].rotation.y, 0.0, deg_to_rad(tire_turn_speed_deg) * delta)
+
 
 ## Finds wheel nodes, assigns roles, and initializes wheel state.
 func _initialize_wheels() -> void:

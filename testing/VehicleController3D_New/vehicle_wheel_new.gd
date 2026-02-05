@@ -12,6 +12,7 @@ enum LeftRightType {RIGHT, LEFT}
 		spring_rest_dist = value
 		update_rest_dist()
 @export var wheel_radius: float = 0.3
+@export var over_extend: float = 0.1
 
 
 var debug: bool = false:
@@ -35,6 +36,7 @@ var left_right: LeftRightType
 ## Where the wheel mesh rests relative to the origin of the raycast, downwards.
 ## Calculated in initialize()
 var spring_damping: float
+var is_slipping: bool = false
 var gizmo: Gizmo3D
 var debug_boxes: Dictionary[String, MeshInstance3D] = {}
 
@@ -52,7 +54,8 @@ func _physics_process(delta: float) -> void:
 
 		_handle_suspension(delta)
 		_handle_acceleration()
-	
+		_handle_traction()
+
 	_handle_wheel_rotation(delta)
 
 	if debug:
@@ -89,22 +92,55 @@ func _handle_acceleration() -> void:
 	var forward_dir: Vector3 = -global_basis.z
 	var speed: float = forward_dir.dot(parent.linear_velocity)
 	var speed_ratio: float = speed / parent.max_speed
-	var acceleration_ratio: float = parent.engine_power_curve.sample_baked(speed_ratio)
-	
+	var acceleration_ratio: float = parent.engine_power_curve.sample_baked(clampf(absf(speed_ratio), 0.0, 1.0))
+
 	if parent.input_accelerate.is_triggered():
 		total_forces.z = parent.engine_power * parent.input_accelerate.value_axis_1d * float(is_powered)
-	elif absf(speed) > 0.05 and not parent.input_accelerate.is_triggered():
-		# Apply drag
-		total_forces.z = -parent.deceleration * signf(speed)
-	
+
 	var force_vector: Vector3 = total_forces.z * forward_dir * acceleration_ratio
 	var force_offset_pos: Vector3 = wheel_mesh.global_position - parent.global_position
-	
+
+	# Drag
+	var tire_vel: Vector3 = _get_point_velocity(wheel_mesh.global_position)
+	var forward_tire_speed: float = forward_dir.dot(tire_vel)
+	var z_drag: float = 0.05
+	var z_drag_force: float = forward_tire_speed * z_drag * _get_wheel_weight()
+	var z_drag_force_vector: Vector3 = global_basis.z * z_drag_force
+
+	total_forces.z += z_drag_force
+	force_vector += z_drag_force_vector
+
+	# Optional: project the acceleration vector along the contact surface
 	#var normal: Vector3 = get_collision_normal()
 	#var projected_vector: Vector3 = (force_vector - normal * force_vector.dot(normal))
 
 	if is_powered:
 		_set_debug_box("accel_force_offset_pos", wheel_mesh.global_position+Vector3.ONE*0.01, Color("32a9f5"))
+
+	parent.apply_force(force_vector, force_offset_pos)
+
+
+func _handle_traction() -> void:
+	var steer_side_dir: Vector3 = global_basis.x
+	var tire_vel: Vector3 = _get_point_velocity(wheel_mesh.global_position)
+	var steering_x_vel: float = steer_side_dir.dot(tire_vel)
+
+	var grip_factor: float = absf(steering_x_vel/tire_vel.length())
+	var x_traction: float = parent.grip_curve.sample_baked(grip_factor)
+
+	if not parent.input_handbrake.is_triggered() and grip_factor < 0.2:
+		is_slipping = false
+
+	if parent.input_handbrake.is_triggered():
+		is_slipping = true
+		x_traction = 0.01
+	elif is_slipping:
+		x_traction = 0.1
+
+	total_forces.x = steering_x_vel * x_traction * _get_wheel_weight()
+
+	var force_vector: Vector3 = total_forces.x * -steer_side_dir
+	var force_offset_pos: Vector3 = wheel_mesh.global_position - parent.global_position
 
 	parent.apply_force(force_vector, force_offset_pos)
 
@@ -130,7 +166,7 @@ func calculate_spring_damping() -> void:
 
 
 func update_rest_dist() -> void:
-	target_position.y = -(spring_rest_dist + wheel_radius)
+	target_position.y = -(spring_rest_dist + wheel_radius + over_extend)
 	if is_instance_valid(wheel_mesh):
 		wheel_mesh.position.y = -spring_rest_dist
 
@@ -139,11 +175,16 @@ func _get_point_velocity(point: Vector3) -> Vector3:
 	return parent.linear_velocity + parent.angular_velocity.cross(point - parent.global_position)
 
 
+func _get_wheel_weight() -> float:
+	var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+	return (parent.mass*gravity)/float(parent.wheels.size()) # Number of wheels
+
+
 func _handle_wheel_rotation(delta: float) -> void:
 	var forward_dir: Vector3 = -global_basis.z
 	var speed: float = forward_dir.dot(parent.linear_velocity)
-	wheel_mesh.rotate_x(-speed * delta * 2.0 * PI * wheel_radius)
-	
+	wheel_mesh.rotate_x((-speed * delta) / wheel_radius)
+
 
 func _set_debug_box(s: String, pos: Vector3, c: Color) -> void:
 	if not debug:

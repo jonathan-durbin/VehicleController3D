@@ -1,10 +1,9 @@
-[gd_scene load_steps=18 format=3 uid="uid://46r01gmhn5my"]
+[gd_scene load_steps=16 format=3 uid="uid://46r01gmhn5my"]
 
 [ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_4xob4"]
 [ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D_New/VehicleController3D_New.tscn" id="1_qyovt"]
 [ext_resource type="Texture2D" uid="uid://epm5r750pnlv" path="res://addons/PrototypeKenneyMaterials-main/black/texture_02.png" id="2_4gqbk"]
 [ext_resource type="Texture2D" uid="uid://dfrlu6a61h56f" path="res://addons/PrototypeKenneyMaterials-main/texture_02_normal.png" id="3_4xob4"]
-[ext_resource type="Resource" uid="uid://df2setcnjy8fk" path="res://testing/input/vehicle_accelerate.tres" id="3_eei0l"]
 [ext_resource type="Texture2D" uid="uid://bfaxc2f6gjgvb" path="res://addons/PrototypeKenneyMaterials-main/purple/texture_01.png" id="5_eei0l"]
 [ext_resource type="Texture2D" uid="uid://fom3snsu0i5h" path="res://addons/PrototypeKenneyMaterials-main/texture_01_normal.png" id="6_hme1e"]
 
@@ -20,11 +19,6 @@ background_mode = 2
 sky = SubResource("Sky_yw8bi")
 tonemap_mode = 2
 glow_enabled = true
-
-[sub_resource type="Curve" id="Curve_4xob4"]
-_data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.3, 0.90000004), 0.0, 0.0, 0, 0, Vector2(0.6, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
-point_count = 4
-metadata/_snap_enabled = true
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_1vc0j"]
 
@@ -63,18 +57,15 @@ shadow_enabled = true
 
 [node name="ClickPusher" type="Node" parent="." node_paths=PackedStringArray("exclude")]
 script = ExtResource("1_4xob4")
-exclude = [NodePath("")]
+exclude = [null]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.8796645, -0.2970239, 0.37143943, 0, 0.7809997, 0.6245314, -0.47559482, -0.5493781, 0.68701774, 12.853144, 27.718195, 51.369255)
+transform = Transform3D(0.8396383, -0.34473422, 0.41972116, 0, 0.77275944, 0.63469905, -0.54314595, -0.5329176, 0.6488384, 22.748123, 19.800522, 36.251476)
 
 [node name="VehicleController3DNew" parent="." instance=ExtResource("1_qyovt")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.52712, 1.8943686, 14.658297)
-mass = 25.0
+transform = Transform3D(0.74535966, 0, 0.66666263, 0, 1, 0, -0.66666263, 0, 0.74535966, 10.52712, 1.8943686, 19.347517)
 debug = true
-engine_power = 600.0
-engine_power_curve = SubResource("Curve_4xob4")
-input_accelerate = ExtResource("3_eei0l")
+drive_type = 1
 
 [node name="Ground" type="StaticBody3D" parent="."]
 
