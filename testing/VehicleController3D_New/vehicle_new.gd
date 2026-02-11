@@ -14,6 +14,33 @@ const GLOBAL_CTX: GUIDEMappingContext = preload("uid://c2hrb2jqlkrmw")
 			if is_instance_valid(wheel):
 				wheel.debug = debug
 
+@export var wheel_radius_map: Dictionary[VehicleWheel.FrontBackType, float] = {
+	VehicleWheel.FrontBackType.FRONT: 0.3,
+	VehicleWheel.FrontBackType.BACK: 0.3,
+	VehicleWheel.FrontBackType.MIDDLE: 0.3,
+}
+
+## How much the raycast should over-extend below the ground.
+## Setting this above zero will pull the vehicle towards the ground.
+@export var over_extend_map: Dictionary[VehicleWheel.FrontBackType, float] = {
+	VehicleWheel.FrontBackType.FRONT: 0.1,
+	VehicleWheel.FrontBackType.BACK: 0.1,
+	VehicleWheel.FrontBackType.MIDDLE: 0.1,
+}
+
+@export var spring_strength_map: Dictionary[VehicleWheel.FrontBackType, float] = {
+	VehicleWheel.FrontBackType.FRONT: 2000.0,
+	VehicleWheel.FrontBackType.BACK: 2000.0,
+	VehicleWheel.FrontBackType.MIDDLE: 2000.0,
+}
+
+## How far down the raycast should the wheel mesh rest when the raycast is not colliding.
+@export var spring_rest_dist_map: Dictionary[VehicleWheel.FrontBackType, float] = {
+	VehicleWheel.FrontBackType.FRONT: 0.5,
+	VehicleWheel.FrontBackType.BACK: 0.5,
+	VehicleWheel.FrontBackType.MIDDLE: 0.5,
+}
+
 ## spring_damp_coefficient * (2.0 * sqrt(spring_strength * mass)).
 ## Where spring_damp_coefficient is between 0 and 1.
 ## More arcade-y: b/w 0.1 and 0.2. More realistic: b/w 0.2 and 1.0.
@@ -25,13 +52,20 @@ const GLOBAL_CTX: GUIDEMappingContext = preload("uid://c2hrb2jqlkrmw")
 		for wheel in wheels.values():
 			if is_instance_valid(wheel):
 				wheel.calculate_spring_damping()
+
 @export_range(0.0, 1000.0, 1.0) var engine_power: float = 300.0
 @export var drive_type: DriveType = DriveType.RWD
 @export var max_speed: float = 10.0 # m/s
+@export var engine_power_curve: Curve
+
 @export var tire_turn_speed_deg: float = 50.0
 @export var tire_max_turn_deg: float = 25.0
-@export var engine_power_curve: Curve
-@export var grip_curve: Curve
+@export var grip_curve_map: Dictionary[VehicleWheel.FrontBackType, Curve] = {
+	VehicleWheel.FrontBackType.FRONT: null,
+	VehicleWheel.FrontBackType.BACK: null,
+	VehicleWheel.FrontBackType.MIDDLE: null,
+}
+
 @export var input_accelerate: GUIDEAction
 @export var input_steer: GUIDEAction
 @export var input_handbrake: GUIDEAction
