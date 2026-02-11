@@ -1,0 +1,154 @@
+[gd_scene load_steps=17 format=3 uid="uid://c572ayo1h1tkm"]
+
+[ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_1xbj4"]
+[ext_resource type="Texture2D" uid="uid://bf2vcs3qe42gc" path="res://addons/PrototypeKenneyMaterials-main/black/texture_01.png" id="1_h3abr"]
+[ext_resource type="Texture2D" uid="uid://b2064xsnrpsf" path="res://addons/PrototypeKenneyMaterials-main/green/texture_02.png" id="2_1xbj4"]
+[ext_resource type="Texture2D" uid="uid://cfsseoo5yypjr" path="res://addons/PrototypeKenneyMaterials-main/purple/texture_02.png" id="3_gbrwi"]
+[ext_resource type="Script" uid="uid://d2n23co2rp7en" path="res://testing/SoftBodyWheelVehicle/wheel_root.gd" id="5_ny35f"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_h3abr"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_1xbj4"]
+sky_material = SubResource("ProceduralSkyMaterial_h3abr")
+
+[sub_resource type="Environment" id="Environment_gbrwi"]
+background_mode = 2
+sky = SubResource("Sky_1xbj4")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_ny35f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_envqd"]
+albedo_texture = ExtResource("1_h3abr")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_t0oim"]
+material = SubResource("StandardMaterial3D_envqd")
+size = Vector2(100, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dmbtt"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.18800001)
+albedo_texture = ExtResource("2_1xbj4")
+normal_enabled = true
+normal_texture = ExtResource("3_gbrwi")
+uv1_scale = Vector3(2, 2, 2)
+uv1_triplanar = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_ff465"]
+material = SubResource("StandardMaterial3D_dmbtt")
+size = Vector3(1.325, 0.395, 2.62)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_xrg3g"]
+points = PackedVector3Array(0.6625, 0.19749998, 1.3097436, 0.6625, -0.1975, 1.3097436, 0.6625, 0.19749998, -1.31, -0.6625, 0.19749998, 1.3097436, -0.6625, -0.1975, 1.3097436, 0.6625, -0.1975, -1.31, -0.6625, 0.19749998, -1.31, -0.6625, -0.1975, -1.31)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rtvet"]
+size = Vector3(1.24, 0.115, 0.12)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0dolj"]
+points = PackedVector3Array(-0.62, -0.0575, -0.06, -0.62, 0.0575, -0.06, 0.62, -0.0575, -0.06, -0.62, -0.0575, 0.060000006, -0.62, 0.0575, 0.060000006, 0.62, 0.0575, -0.06, 0.62, -0.0575, 0.060000006, 0.62, 0.0575, 0.060000006)
+
+[node name="SoftBodyWheelVehicleTestScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_gbrwi")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.6560592, -0.46204576, 0.59674126, 0, 0.79069, 0.6122167, -0.7547095, -0.4016504, 0.51873946, 1.5029672, 1.7443216, 1.3123478)
+
+[node name="ClickPusher" type="Node" parent="." node_paths=PackedStringArray("exclude_nodes")]
+script = ExtResource("1_1xbj4")
+exclude_nodes = [NodePath("../SoftBodyWheelVehicle")]
+layers = 4
+metadata/_custom_type_script = "uid://bouyhbi1qls1o"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+visible = false
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("WorldBoundaryShape3D_ny35f")
+
+[node name="GroundPlane" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_t0oim")
+
+[node name="SoftBodyWheelVehicle" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48967874, 0)
+collision_layer = 2
+collision_mask = 16
+can_sleep = false
+freeze = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SoftBodyWheelVehicle"]
+mesh = SubResource("BoxMesh_ff465")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SoftBodyWheelVehicle"]
+shape = SubResource("ConvexPolygonShape3D_xrg3g")
+debug_color = Color(2.8878452e-07, 0.3958376, 0.46558928, 0.41960785)
+
+[node name="BackAxleJoint" type="Generic6DOFJoint3D" parent="SoftBodyWheelVehicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17078745, 0.90392387)
+node_a = NodePath("../BackAxle")
+linear_limit_y/lower_distance = -0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 240.505
+linear_spring_y/damping = 9.79
+linear_spring_y/equilibrium_point = -0.05
+angular_limit_z/upper_angle = 0.43633232
+angular_limit_z/lower_angle = -0.43633232
+angular_spring_z/enabled = true
+angular_spring_z/stiffness = 100.9
+angular_spring_z/damping = 19.11
+
+[node name="BackAxle" type="RigidBody3D" parent="SoftBodyWheelVehicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17078745, 0.90392387)
+collision_layer = 4
+collision_mask = 16
+can_sleep = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SoftBodyWheelVehicle/BackAxle"]
+mesh = SubResource("BoxMesh_rtvet")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SoftBodyWheelVehicle/BackAxle"]
+shape = SubResource("ConvexPolygonShape3D_0dolj")
+
+[node name="WheelRoot" type="Node3D" parent="SoftBodyWheelVehicle/BackAxle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6187474, 0, 0)
+script = ExtResource("5_ny35f")
+nub_layer = 8
+nub_mask = 16
+
+[node name="FrontAxleJoint" type="Generic6DOFJoint3D" parent="SoftBodyWheelVehicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17078745, -0.99942553)
+node_a = NodePath("../FrontAxle")
+linear_limit_y/lower_distance = -0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 240.505
+linear_spring_y/damping = 9.79
+linear_spring_y/equilibrium_point = -0.05
+angular_limit_z/upper_angle = 0.43633232
+angular_limit_z/lower_angle = -0.43633232
+angular_spring_z/enabled = true
+angular_spring_z/stiffness = 100.9
+angular_spring_z/damping = 19.11
+
+[node name="FrontAxle" type="RigidBody3D" parent="SoftBodyWheelVehicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17078745, -0.99942553)
+collision_layer = 4
+collision_mask = 16
+can_sleep = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SoftBodyWheelVehicle/FrontAxle"]
+mesh = SubResource("BoxMesh_rtvet")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SoftBodyWheelVehicle/FrontAxle"]
+shape = SubResource("ConvexPolygonShape3D_0dolj")

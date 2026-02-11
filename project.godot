@@ -62,6 +62,14 @@ crouch={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_1="global"
+3d_physics/layer_2="vehicle_body"
+3d_physics/layer_3="vehicle_axle"
+3d_physics/layer_4="vehicle_tire"
+3d_physics/layer_5="static"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
