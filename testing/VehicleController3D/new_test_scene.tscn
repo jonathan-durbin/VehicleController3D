@@ -1,12 +1,12 @@
 [gd_scene load_steps=21 format=3 uid="uid://46r01gmhn5my"]
 
-[ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_4xob4"]
-[ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D_New/VehicleController3D_New.tscn" id="1_qyovt"]
-[ext_resource type="Texture2D" uid="uid://epm5r750pnlv" path="res://addons/PrototypeKenneyMaterials-main/black/texture_02.png" id="2_4gqbk"]
-[ext_resource type="Texture2D" uid="uid://dfrlu6a61h56f" path="res://addons/PrototypeKenneyMaterials-main/texture_02_normal.png" id="3_4xob4"]
-[ext_resource type="Script" uid="uid://cyhnnv87066j6" path="res://testing/vehicle_camera.gd" id="3_eei0l"]
-[ext_resource type="Texture2D" uid="uid://bfaxc2f6gjgvb" path="res://addons/PrototypeKenneyMaterials-main/purple/texture_01.png" id="5_eei0l"]
-[ext_resource type="Texture2D" uid="uid://fom3snsu0i5h" path="res://addons/PrototypeKenneyMaterials-main/texture_01_normal.png" id="6_hme1e"]
+[ext_resource type="Script" uid="uid://bouyhbi1qls1o" path="res://testing/click_pusher.gd" id="1_k8cq5"]
+[ext_resource type="PackedScene" uid="uid://l6bonehq6hgh" path="res://testing/VehicleController3D/VehicleController3D.tscn" id="2_w160k"]
+[ext_resource type="Script" uid="uid://cyhnnv87066j6" path="res://testing/vehicle_camera.gd" id="3_iriqg"]
+[ext_resource type="Texture2D" uid="uid://epm5r750pnlv" path="res://addons/PrototypeKenneyMaterials-main/black/texture_02.png" id="4_00vr8"]
+[ext_resource type="Texture2D" uid="uid://dfrlu6a61h56f" path="res://addons/PrototypeKenneyMaterials-main/texture_02_normal.png" id="5_5k1s0"]
+[ext_resource type="Texture2D" uid="uid://bfaxc2f6gjgvb" path="res://addons/PrototypeKenneyMaterials-main/purple/texture_01.png" id="6_ma070"]
+[ext_resource type="Texture2D" uid="uid://fom3snsu0i5h" path="res://addons/PrototypeKenneyMaterials-main/texture_01_normal.png" id="7_2xc53"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1vc0j"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -24,9 +24,9 @@ glow_enabled = true
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_1vc0j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g0yjs"]
-albedo_texture = ExtResource("2_4gqbk")
+albedo_texture = ExtResource("4_00vr8")
 normal_enabled = true
-normal_texture = ExtResource("3_4xob4")
+normal_texture = ExtResource("5_5k1s0")
 uv1_triplanar = true
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_4gqbk"]
@@ -34,9 +34,9 @@ material = SubResource("StandardMaterial3D_g0yjs")
 size = Vector2(20, 20)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goltg"]
-albedo_texture = ExtResource("5_eei0l")
+albedo_texture = ExtResource("6_ma070")
 normal_enabled = true
-normal_texture = ExtResource("6_hme1e")
+normal_texture = ExtResource("7_2xc53")
 uv1_triplanar = true
 
 [sub_resource type="PrismMesh" id="PrismMesh_qi25k"]
@@ -71,13 +71,13 @@ transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545
 shadow_enabled = true
 
 [node name="ClickPusher" type="Node" parent="." node_paths=PackedStringArray("exclude")]
-script = ExtResource("1_4xob4")
+script = ExtResource("1_k8cq5")
 exclude = [null]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-0.99797374, 0.011210271, -0.0626324, 0, 0.98435706, 0.17618535, 0.06362772, 0.17582834, -0.98236245, 3.8712587, 3.0285487, -8.6479435)
 
-[node name="VehicleController3DNew" parent="." instance=ExtResource("1_qyovt")]
+[node name="VehicleController3DNew" parent="." instance=ExtResource("2_w160k")]
 transform = Transform3D(0.74535966, 0, 0.66666263, 0, 1, 0, -0.66666263, 0, 0.74535966, 10.52712, 1.8943686, 19.347517)
 debug = true
 spring_damp_coefficient = 0.24
@@ -87,7 +87,7 @@ drive_type = 1
 transform = Transform3D(0.74535966, 0.00570131, 0.66663826, -1.4901161e-08, 0.9999635, -0.008552001, -0.66666263, 0.0063743065, 0.7453324, 14.451991, 4.2689466, 23.735704)
 top_level = true
 current = true
-script = ExtResource("3_eei0l")
+script = ExtResource("3_iriqg")
 
 [node name="Ground" type="StaticBody3D" parent="."]
 
