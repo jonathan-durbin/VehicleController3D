@@ -12,7 +12,7 @@ config_version=5
 
 config/name="VehicleController3D"
 config/tags=PackedStringArray("addon")
-run/main_scene="uid://em4ybmol1p6e"
+run/main_scene="uid://46r01gmhn5my"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

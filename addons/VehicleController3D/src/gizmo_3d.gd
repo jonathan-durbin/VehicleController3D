@@ -32,6 +32,15 @@ func set_targetf(axis: String, target: float) -> void:
 			axes[_axis].mesh.height = absf(target)
 
 
+func set_targetv(vec: Vector3) -> void:
+	axes["x"].position.x = vec.x / 2.0
+	axes["x"].mesh.height = absf(vec.x)
+	axes["y"].position.y = vec.y / 2.0
+	axes["y"].mesh.height = absf(vec.y)
+	axes["z"].position.z = vec.z / 2.0
+	axes["z"].mesh.height = absf(vec.z)
+
+
 ## Builds a colored cylinder mesh to represent an axis direction.
 func _create_axis_mesh(axis: String) -> void:
 	# Create mesh and shape

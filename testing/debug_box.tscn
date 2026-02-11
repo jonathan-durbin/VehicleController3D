@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://b0p5nm6aj735b"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2h034"]
+resource_local_to_scene = true
+render_priority = 100
+no_depth_test = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_7i878"]
+size = Vector3(0.1, 0.1, 0.1)
+
+[node name="MeshInstance3D" type="MeshInstance3D"]
+material_override = SubResource("StandardMaterial3D_2h034")
+mesh = SubResource("BoxMesh_7i878")
