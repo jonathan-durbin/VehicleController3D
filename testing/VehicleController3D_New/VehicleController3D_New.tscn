@@ -1,25 +1,22 @@
-[gd_scene load_steps=22 format=3 uid="uid://l6bonehq6hgh"]
+[gd_scene load_steps=24 format=3 uid="uid://l6bonehq6hgh"]
 
 [ext_resource type="Script" uid="uid://b0hax8se0o5b" path="res://testing/VehicleController3D_New/vehicle_new.gd" id="1_ac7o1"]
+[ext_resource type="Curve" uid="uid://dei5k3816y27f" path="res://testing/VehicleController3D_New/wheel_grip_front.tres" id="2_a7ogb"]
 [ext_resource type="Script" uid="uid://bruxw4q556eh3" path="res://testing/VehicleController3D_New/vehicle_wheel_new.gd" id="2_ajfxx"]
 [ext_resource type="Resource" uid="uid://df2setcnjy8fk" path="res://testing/input/vehicle_accelerate.tres" id="2_rgiua"]
 [ext_resource type="Texture2D" uid="uid://cym2d0tahtv0w" path="res://addons/PrototypeKenneyMaterials-main/green/texture_01.png" id="2_v4xlo"]
+[ext_resource type="Curve" uid="uid://bq7cs4s778phu" path="res://testing/VehicleController3D_New/wheel_grip_back.tres" id="3_5pni1"]
 [ext_resource type="Texture2D" uid="uid://fom3snsu0i5h" path="res://addons/PrototypeKenneyMaterials-main/texture_01_normal.png" id="3_hggyk"]
 [ext_resource type="Resource" uid="uid://dl2fm4uxhuarh" path="res://testing/input/vehicle_steer.tres" id="3_jnsi7"]
 [ext_resource type="Resource" uid="uid://cmt1og6orbrb3" path="res://testing/input/vehicle_handbrake.tres" id="4_bi8uc"]
 [ext_resource type="Texture2D" uid="uid://bd48jnmlckm55" path="res://addons/PrototypeKenneyMaterials-main/light/texture_01.png" id="4_hggyk"]
+[ext_resource type="Curve" uid="uid://bmcr0k4xwmc7w" path="res://testing/VehicleController3D_New/wheel_grip_other.tres" id="4_o12pt"]
 [ext_resource type="Texture2D" uid="uid://bf2vcs3qe42gc" path="res://addons/PrototypeKenneyMaterials-main/black/texture_01.png" id="5_rgiua"]
 
 [sub_resource type="Curve" id="Curve_hggyk"]
 _data = [Vector2(0, 0.6), 0.0, 0.0, 0, 0, Vector2(0.3, 0.90000004), 0.0, 0.0, 0, 0, Vector2(0.6, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
 point_count = 4
 metadata/_snap_enabled = true
-
-[sub_resource type="Curve" id="Curve_bi8uc"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 0.6), 0.0, 0.0, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
-point_count = 3
-metadata/_snap_enabled = true
-metadata/_snap_count = 20
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnsi7"]
 albedo_texture = ExtResource("2_v4xlo")
@@ -78,11 +75,29 @@ mass = 15.0
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.45, 0.1)
 can_sleep = false
-contact_monitor = true
 max_contacts_reported = 10
+linear_damp_mode = 1
 script = ExtResource("1_ac7o1")
+wheel_radius_map = Dictionary[int, float]({
+0: 0.3,
+1: 0.5,
+2: 0.3
+})
+spring_rest_dist_map = Dictionary[int, float]({
+0: 0.41,
+1: 0.41,
+2: 0.41
+})
+engine_power = 267.0
+max_speed = 17.5
 engine_power_curve = SubResource("Curve_hggyk")
-grip_curve = SubResource("Curve_bi8uc")
+tire_turn_speed_deg = 70.31
+tire_max_turn_deg = 28.75
+grip_curve_map = Dictionary[int, Curve]({
+0: ExtResource("2_a7ogb"),
+1: ExtResource("3_5pni1"),
+2: ExtResource("4_o12pt")
+})
 input_accelerate = ExtResource("2_rgiua")
 input_steer = ExtResource("3_jnsi7")
 input_handbrake = ExtResource("4_bi8uc")
@@ -98,45 +113,40 @@ mesh = SubResource("BoxMesh_jnsi7")
 shape = SubResource("BoxShape3D_qke2f")
 
 [node name="VehicleWheelBR" type="RayCast3D" parent="."]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9984913, 1.1920929e-07, 1.7627484)
-enabled = false
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
-spring_rest_dist = 0.415
-wheel_radius = 0.5
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelBR"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_hggyk")
 
 [node name="VehicleWheelBL" type="RayCast3D" parent="."]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.998, 0, 1.763)
-enabled = false
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
-spring_rest_dist = 0.415
-wheel_radius = 0.5
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelBL"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_rgiua")
 
 [node name="VehicleWheelFR" type="RayCast3D" parent="."]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9984913, 1.1920929e-07, -1.6343957)
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
-spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelFR"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_jnsi7")
 
 [node name="VehicleWheelFL" type="RayCast3D" parent="."]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.998, 0, -1.6341441)
-enabled = false
 debug_shape_thickness = 5
 script = ExtResource("2_ajfxx")
-spring_rest_dist = 0.415
 
 [node name="WheelMesh" type="MeshInstance3D" parent="VehicleWheelFL"]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, -0.5, 0)
